@@ -1,0 +1,351 @@
+
+<div class="flex h-screen w-full flex-col md:flex-row font-sans">
+  
+  <!-- Left Panel: Controls & History -->
+  <div class="w-full md:w-1/3 lg:w-1/4 bg-white border-r border-gray-200 flex flex-col z-10 shadow-lg md:shadow-none h-full">
+    
+    <!-- Header -->
+    <div class="p-6 pb-2">
+      <header class="mb-4">
+        <div class="flex items-center gap-3 text-indigo-600 mb-1">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.048 4.025a3 3 0 0 1-5.994 0m11.132-3.332a3 3 0 0 1 3.338 3.388m0 0a5.997 5.997 0 0 1-1.616 3.388m-6.772-2.19a3 3 0 0 1 5.995 0m-8.77-5.035a3 3 0 0 1 0-5.995m0 0A16.02 16.02 0 0 1 12 2.25c4.5 0 8.31 3.243 9.15 7.643a3 3 0 0 1-1.996 3.32m-9.154 3.765a3 3 0 0 1-2.67-5.88" />
+          </svg>
+          <h1 class="text-2xl font-bold tracking-tight text-gray-900">OmniWriter <span class="text-lg font-normal text-gray-500 ml-1">نووسەری زیرەک</span></h1>
+        </div>
+        <p class="text-sm text-gray-500">Master of Words - Advanced AI Assistant</p>
+      </header>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-gray-200">
+        <button 
+          (click)="activeTab.set('create')"
+          class="flex-1 py-2 text-sm font-medium text-center border-b-2 transition-colors duration-200"
+          [class]="activeTab() === 'create' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+        >
+          Create
+        </button>
+        <button 
+          (click)="activeTab.set('history')"
+          class="flex-1 py-2 text-sm font-medium text-center border-b-2 transition-colors duration-200"
+          [class]="activeTab() === 'history' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700'"
+        >
+          History ({{historyItems().length}})
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab Content -->
+    <div class="flex-1 overflow-y-auto p-6 pt-2">
+      
+      <!-- CREATE TAB -->
+      @if (activeTab() === 'create') {
+        <div class="space-y-4 animate-fadeIn">
+          <!-- Language -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Language</label>
+            <div class="relative">
+              <select 
+                [ngModel]="selectedLanguage()" 
+                (ngModelChange)="selectedLanguage.set($event)"
+                class="block w-full rounded-md border-gray-300 bg-gray-50 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border"
+              >
+                @for (lang of languages; track lang) {
+                  <option [value]="lang">{{ lang }}</option>
+                }
+              </select>
+            </div>
+          </div>
+
+          <!-- Type -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Type</label>
+            <select 
+              [ngModel]="selectedType()" 
+              (ngModelChange)="selectedType.set($event)"
+              class="block w-full rounded-md border-gray-300 bg-gray-50 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border"
+            >
+              @for (t of types; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Tone -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tone</label>
+            <select 
+              [ngModel]="selectedTone()" 
+              (ngModelChange)="selectedTone.set($event)"
+              class="block w-full rounded-md border-gray-300 bg-gray-50 py-2 px-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border"
+            >
+              @for (tone of tones; track tone) {
+                <option [value]="tone">{{ tone }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Length -->
+          <div>
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Length</label>
+            <div class="flex rounded-md shadow-sm" role="group">
+              @for (len of lengths; track len) {
+                <button 
+                  type="button" 
+                  (click)="selectedLength.set(len)"
+                  [class]="selectedLength() === len ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                  class="flex-1 px-4 py-2 text-xs font-medium border border-gray-300 first:rounded-l-md last:rounded-r-md focus:z-10 focus:ring-2 focus:ring-indigo-500 focus:text-indigo-600 transition-colors"
+                >
+                  {{ len }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <hr class="border-gray-200 my-2">
+
+          <!-- Advanced Features -->
+          <div class="space-y-3">
+            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Advanced Intelligence</label>
+            
+            <!-- Search Toggle -->
+            <div class="flex items-center justify-between">
+              <span class="flex-grow flex flex-col">
+                <span class="text-sm font-medium text-gray-900">Google Search</span>
+                <span class="text-xs text-gray-500">For accurate, up-to-date info</span>
+              </span>
+              <button 
+                type="button" 
+                (click)="useSearch.set(!useSearch())"
+                [class]="useSearch() ? 'bg-indigo-600' : 'bg-gray-200'"
+                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
+              >
+                <span 
+                  aria-hidden="true" 
+                  [class]="useSearch() ? 'translate-x-5' : 'translate-x-0'"
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                ></span>
+              </button>
+            </div>
+
+            <!-- Thinking Toggle -->
+            <div class="flex items-center justify-between">
+              <span class="flex-grow flex flex-col">
+                <span class="text-sm font-medium text-gray-900">Deep Thinking</span>
+                <span class="text-xs text-gray-500">For complex, creative tasks</span>
+              </span>
+              <button 
+                type="button" 
+                (click)="useThinking.set(!useThinking())"
+                [class]="useThinking() ? 'bg-purple-600' : 'bg-gray-200'"
+                class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-offset-2"
+              >
+                <span 
+                  aria-hidden="true" 
+                  [class]="useThinking() ? 'translate-x-5' : 'translate-x-0'"
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"
+                ></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      } 
+      
+      <!-- HISTORY TAB -->
+      @else {
+        <div class="space-y-3 animate-fadeIn">
+          @if (historyItems().length === 0) {
+            <div class="text-center py-8 text-gray-400">
+              <p class="text-sm">No history yet.</p>
+              <p class="text-xs mt-1">Generate text and click save!</p>
+            </div>
+          }
+          
+          @for (item of historyItems(); track item.id) {
+            <div 
+              (click)="loadHistoryItem(item)"
+              class="group relative bg-white border border-gray-200 rounded-lg p-3 hover:shadow-md hover:border-indigo-300 transition-all cursor-pointer"
+            >
+              <div class="flex justify-between items-start mb-1">
+                <span class="text-xs font-bold text-indigo-600 uppercase">{{ item.type }}</span>
+                <span class="text-[10px] text-gray-400">{{ item.created_at | date:'short' }}</span>
+              </div>
+              <p class="text-sm text-gray-900 font-medium line-clamp-2 mb-2">{{ item.prompt }}</p>
+              <div class="flex items-center justify-between">
+                 <span class="text-xs text-gray-500">{{ item.language }}</span>
+                 <button 
+                   (click)="deleteHistoryItem(item.id, $event)"
+                   class="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                   title="Delete"
+                 >
+                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                      <path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 1 0 .23 1.482l.149-.022.841 10.518A2.75 2.75 0 0 0 7.596 19h4.807a2.75 2.75 0 0 0 2.742-2.53l.841-10.52.149.023a.75.75 0 0 0 .23-1.482A41.03 41.03 0 0 0 14 4.193V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4ZM8.58 7.72a.75.75 0 0 0-1.5.06l.3 7.5a.75.75 0 1 0 1.5-.06l-.3-7.5Zm4.34.06a.75.75 0 1 0-1.5-.06l-.3 7.5a.75.75 0 1 0 1.5.06l.3-7.5Z" clip-rule="evenodd" />
+                   </svg>
+                 </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+
+    <div class="mt-auto pt-4 pb-6 text-xs text-gray-400 flex flex-col items-center gap-2 text-center border-t border-gray-100 mx-6">
+      <span>Powered by Gemini 2.5 Flash</span>
+      <a href="https://github.com/sardaramin039-gif/-" target="_blank" class="flex items-center gap-1.5 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg viewBox="0 0 24 24" class="w-4 h-4 fill-current" aria-hidden="true">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        <span>GitHub Repo</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Right Panel: Workspace -->
+  <div class="flex-1 flex flex-col h-full bg-gray-50 overflow-hidden relative">
+    
+    <!-- Input Area -->
+    <div class="p-6 bg-white shadow-sm border-b border-gray-200 z-10">
+      <div class="relative">
+        <label for="prompt" class="sr-only">Your topic or prompt</label>
+        <textarea
+          id="prompt"
+          [ngModel]="prompt()"
+          (ngModelChange)="prompt.set($event)"
+          rows="3"
+          class="block w-full rounded-lg border-gray-300 py-3 px-4 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border resize-none"
+          placeholder="What would you like OmniWriter to create today?"
+          [class.font-kurdish]="isRTL()"
+          [dir]="isRTL() ? 'rtl' : 'ltr'"
+        ></textarea>
+        
+        <div class="mt-3 flex justify-end">
+          <button
+            (click)="onGenerate()"
+            [disabled]="isLoading() || !prompt().trim()"
+            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+          >
+            @if (isLoading()) {
+              <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Writing...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 mr-2">
+                <path d="M21.721 12.752a9.711 9.711 0 0 0-.945-5.003 12.754 12.754 0 0 1-4.339 2.708 18.991 18.991 0 0 1-.214 4.772 17.165 17.165 0 0 0 5.498-2.477ZM14.634 15.55a17.324 17.324 0 0 0 .332-4.647c-.952.227-1.945.347-2.966.347-1.021 0-2.014-.12-2.966-.347a17.515 17.515 0 0 0 .332 4.647 17.387 17.387 0 0 0 5.268 0ZM9.772 17.119a18.963 18.963 0 0 0 4.456 0A17.182 17.182 0 0 1 12 21.724a17.165 17.165 0 0 1-2.228-4.605ZM7.777 3.523a19.398 19.398 0 0 0-.215 4.773 12.753 12.753 0 0 1-4.339-2.708 9.711 9.711 0 0 0-.944 5.003 17.165 17.165 0 0 0 5.498 2.477A19.301 19.301 0 0 0 9.528 8.43a9 9 0 0 1-1.751-4.907Zm15.484 2.344a12.753 12.753 0 0 1-4.339 2.708 18.996 18.996 0 0 1-.214-4.773 9 9 0 0 1-1.751 4.907 19.301 19.301 0 0 0 5.358 4.634 17.165 17.165 0 0 0 5.498-2.477 9.711 9.711 0 0 0-.944-5.003h-.002ZM12 2.276a17.152 17.152 0 0 1 2.805 7.121c-.897.23-1.837.353-2.805.353-.968 0-1.908-.122-2.805-.353A17.151 17.151 0 0 1 12 2.276ZM9.53 16.122a3 3 0 0 0-5.78 1.128 2.25 2.25 0 0 1-2.4 2.245 4.5 4.5 0 0 0 8.4-2.245c0-.399-.078-.78-.22-1.128Zm0 0a15.998 15.998 0 0 0 3.388-1.62m-5.048 4.025a3 3 0 0 1-5.994 0m11.132-3.332a3 3 0 0 1 3.338 3.388m0 0a5.997 5.997 0 0 1-1.616 3.388m-6.772-2.19a3 3 0 0 1 5.995 0m-8.77-5.035a3 3 0 0 1 0-5.995m0 0A16.02 16.02 0 0 1 12 2.25" />
+              </svg>
+              OmniWrite
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Area -->
+    <div class="flex-1 overflow-y-auto p-6 md:p-12 relative bg-gray-50">
+      @if (error()) {
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4 rounded-md shadow-sm">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-red-700">{{ error() }}</p>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (generatedText()) {
+        <div class="mx-auto max-w-3xl bg-white p-8 md:p-12 rounded-xl shadow-sm min-h-[500px] border border-gray-100 relative group animate-fadeIn">
+          
+          <div class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+            <!-- Save Button -->
+            <button 
+              (click)="onSave()"
+              [disabled]="isSaving() || saveStatus() === 'success'"
+              class="p-2 rounded-full transition-all border border-transparent"
+              [class]="saveStatus() === 'success' ? 'text-green-600 bg-green-50 border-green-200' : 'text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 border-transparent'"
+              [title]="saveStatus() === 'success' ? 'Saved!' : 'Save to History'"
+            >
+              @if (isSaving()) {
+                <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              } @else if (saveStatus() === 'success') {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.75V16.5L12 14.25 7.5 16.5V3.75m9 0H18A2.25 2.25 0 0 1 20.25 6v12A2.25 2.25 0 0 1 18 20.25H6A2.25 2.25 0 0 1 3.75 18V6A2.25 2.25 0 0 1 6 3.75h1.5m9 0h-9" />
+                </svg>
+              }
+            </button>
+
+            <!-- Copy Button -->
+            <button 
+              (click)="copyToClipboard()"
+              class="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-all"
+              title="Copy to clipboard"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+              </svg>
+            </button>
+          </div>
+
+          <div 
+            class="prose prose-lg prose-indigo max-w-none whitespace-pre-wrap leading-relaxed"
+            [class.font-kurdish]="isRTL()"
+            [dir]="isRTL() ? 'rtl' : 'ltr'"
+          >
+            {{ generatedText() }}
+          </div>
+
+          @if (groundingMetadata().length > 0) {
+             <div class="mt-12 pt-6 border-t border-gray-100">
+               <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Sources</h3>
+               <div class="grid gap-2">
+                 @for (chunk of groundingMetadata(); track chunk.web?.uri) {
+                   <a 
+                     [href]="chunk.web?.uri" 
+                     target="_blank" 
+                     class="flex items-center p-2 rounded-lg bg-gray-50 hover:bg-indigo-50 transition-colors border border-gray-200 hover:border-indigo-200"
+                   >
+                     <div class="flex-shrink-0 mr-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
+                          <path fill-rule="evenodd" d="M4.25 5.5a.75.75 0 0 0-.75.75v8.5c0 .414.336.75.75.75h8.5a.75.75 0 0 0 .75-.75v-4a.75.75 0 0 1 1.5 0v4A2.25 2.25 0 0 1 12.75 17h-8.5A2.25 2.25 0 0 1 2 14.75v-8.5A2.25 2.25 0 0 1 4.25 4h5a.75.75 0 0 1 0 1.5h-5Z" clip-rule="evenodd" />
+                          <path fill-rule="evenodd" d="M6.194 12.753a.75.75 0 0 0 1.06.053L16.5 4.44v2.81a.75.75 0 0 0 1.5 0v-4.5a.75.75 0 0 0-.75-.75h-4.5a.75.75 0 0 0 0 1.5h2.553l-9.056 8.194a.75.75 0 0 0-.053 1.06Z" clip-rule="evenodd" />
+                        </svg>
+                     </div>
+                     <div class="flex-1 min-w-0">
+                       <p class="text-sm font-medium text-gray-900 truncate">{{ chunk.web?.title || 'Web Result' }}</p>
+                       <p class="text-xs text-gray-500 truncate">{{ chunk.web?.uri }}</p>
+                     </div>
+                   </a>
+                 }
+               </div>
+             </div>
+          }
+        </div>
+      } @else if (!isLoading()) {
+        <div class="h-full flex flex-col items-center justify-center text-center p-12 opacity-50 select-none animate-fadeIn">
+          <div class="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-6 text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-bold text-gray-900 mb-2">Ready to Write</h2>
+          <p class="text-gray-500 max-w-sm">
+            Select your language, type, and tone, then enter a topic to start creating.
+          </p>
+        </div>
+      }
+    </div>
+  </div>
+</div>
